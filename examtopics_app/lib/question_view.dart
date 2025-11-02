@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:examtopics_app/models.dart';
+import 'package:examapp/models.dart';
 
 class QuestionView extends StatefulWidget {
   final Question question;

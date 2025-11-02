@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:convert';
-import 'package:examtopics_app/models.dart';
+import 'package:examapp/models.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -34,8 +34,7 @@ class DatabaseHelper {
     await db.execute(
       'CREATE TABLE exams(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT)',
     );
-    await db.execute(
-      '''CREATE TABLE questions(
+    await db.execute('''CREATE TABLE questions(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         examId INTEGER,
         title TEXT,
@@ -48,16 +47,19 @@ class DatabaseHelper {
         discussion TEXT, -- Stored as JSON string
         isMarkedForReview INTEGER DEFAULT 0,
         FOREIGN KEY (examId) REFERENCES exams(id) ON DELETE CASCADE
-      )''',
-    );
+      )''');
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE questions ADD COLUMN isMarkedForReview INTEGER DEFAULT 0');
+      await db.execute(
+        'ALTER TABLE questions ADD COLUMN isMarkedForReview INTEGER DEFAULT 0',
+      );
     }
     if (oldVersion < 3) {
-      await db.execute('ALTER TABLE questions ADD COLUMN voteDistribution TEXT');
+      await db.execute(
+        'ALTER TABLE questions ADD COLUMN voteDistribution TEXT',
+      );
     }
   }
 
@@ -71,7 +73,10 @@ class DatabaseHelper {
     return await db.insert('questions', question.toMap());
   }
 
-  Future<void> updateQuestionReviewStatus(int id, bool isMarkedForReview) async {
+  Future<void> updateQuestionReviewStatus(
+    int id,
+    bool isMarkedForReview,
+  ) async {
     Database db = await database;
     await db.update(
       'questions',
@@ -108,8 +113,8 @@ class DatabaseHelper {
         correctAnswer: maps[i]['correctAnswer'],
         voteDistribution: maps[i]['voteDistribution'] != null
             ? (jsonDecode(maps[i]['voteDistribution']) as List)
-                .map((e) => e as Map<String, dynamic>)
-                .toList()
+                  .map((e) => e as Map<String, dynamic>)
+                  .toList()
             : null,
         choices: (jsonDecode(maps[i]['choices']) as List)
             .map((e) => Choice.fromJson(e as Map<String, dynamic>))
@@ -124,11 +129,7 @@ class DatabaseHelper {
 
   Future<void> deleteExam(int examId) async {
     Database db = await database;
-    await db.delete(
-      'exams',
-      where: 'id = ?',
-      whereArgs: [examId],
-    );
+    await db.delete('exams', where: 'id = ?', whereArgs: [examId]);
     // Questions will be deleted automatically due to ON DELETE CASCADE
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart'; // Import for kIsWeb
 import 'package:flutter/material.dart';
-import 'package:examtopics_app/models.dart';
-import 'package:examtopics_app/question_view.dart';
+import 'package:examapp/models.dart';
+import 'package:examapp/question_view.dart';
 
 class QuestionPagerScreen extends StatefulWidget {
   final List<Question> questions;
@@ -50,7 +50,9 @@ class _QuestionPagerScreenState extends State<QuestionPagerScreen> {
     setState(() {
       final index = _questions.indexWhere((q) => q.id == question.id);
       if (index != -1) {
-        _questions[index] = question.copyWith(isMarkedForReview: !question.isMarkedForReview);
+        _questions[index] = question.copyWith(
+          isMarkedForReview: !question.isMarkedForReview,
+        );
       }
     });
   }
@@ -58,9 +60,7 @@ class _QuestionPagerScreenState extends State<QuestionPagerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Questions'),
-      ),
+      appBar: AppBar(title: const Text('Questions')),
       body: Column(
         children: [
           Expanded(
@@ -68,7 +68,10 @@ class _QuestionPagerScreenState extends State<QuestionPagerScreen> {
               controller: _pageController,
               itemCount: _questions.length,
               itemBuilder: (context, index) {
-                return QuestionView(question: _questions[index], onToggleReview: _handleToggleReview);
+                return QuestionView(
+                  question: _questions[index],
+                  onToggleReview: _handleToggleReview,
+                );
               },
             ),
           ),

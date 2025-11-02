@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:examtopics_app/models.dart';
-import 'package:examtopics_app/database_helper.dart';
-import 'package:examtopics_app/exam_home_screen.dart';
+import 'package:examapp/models.dart';
+import 'package:examapp/database_helper.dart';
+import 'package:examapp/exam_home_screen.dart';
 
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 

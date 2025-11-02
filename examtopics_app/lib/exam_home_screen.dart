@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:examtopics_app/models.dart';
-import 'package:examtopics_app/database_helper.dart';
-import 'package:examtopics_app/question_pager_screen.dart';
+import 'package:examapp/models.dart';
+import 'package:examapp/database_helper.dart';
+import 'package:examapp/question_pager_screen.dart';
 
 class ExamHomeScreen extends StatefulWidget {
   final Exam exam;
@@ -12,13 +12,16 @@ class ExamHomeScreen extends StatefulWidget {
   State<ExamHomeScreen> createState() => _ExamHomeScreenState();
 }
 
-class _ExamHomeScreenState extends State<ExamHomeScreen> with SingleTickerProviderStateMixin {
+class _ExamHomeScreenState extends State<ExamHomeScreen>
+    with SingleTickerProviderStateMixin {
   final DatabaseHelper _databaseHelper = DatabaseHelper();
   late TabController _tabController;
   List<Question> _questions = [];
   List<Question> _questionsForReview = [];
-  List<Question> _allExamQuestions = []; // New: Unfiltered list of all questions
-  List<Question> _allReviewQuestions = []; // New: Unfiltered list of all reviewed questions
+  List<Question> _allExamQuestions =
+      []; // New: Unfiltered list of all questions
+  List<Question> _allReviewQuestions =
+      []; // New: Unfiltered list of all reviewed questions
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _isSearching = false; // New state variable
@@ -26,7 +29,10 @@ class _ExamHomeScreenState extends State<ExamHomeScreen> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this); // initialIndex 0 is now All Questions
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+    ); // initialIndex 0 is now All Questions
     _searchController.addListener(_onSearchChanged);
     _loadQuestions();
   }
@@ -58,29 +64,40 @@ class _ExamHomeScreenState extends State<ExamHomeScreen> with SingleTickerProvid
 
   Future<void> _loadQuestions() async {
     // Load all questions once and store in _allExamQuestions
-    List<Question> fetchedQuestions = await _databaseHelper.getQuestionsForExam(widget.exam.id!); // Get all questions from DB
+    List<Question> fetchedQuestions = await _databaseHelper.getQuestionsForExam(
+      widget.exam.id!,
+    ); // Get all questions from DB
 
     setState(() {
       _allExamQuestions = fetchedQuestions; // Store the full list
-      _allReviewQuestions = _allExamQuestions.where((q) => q.isMarkedForReview).toList(); // Populate full list of reviewed questions
+      _allReviewQuestions = _allExamQuestions
+          .where((q) => q.isMarkedForReview)
+          .toList(); // Populate full list of reviewed questions
 
-      List<Question> currentDisplayedQuestions = _allExamQuestions; // Start with full list for search filtering
+      List<Question> currentDisplayedQuestions =
+          _allExamQuestions; // Start with full list for search filtering
 
       if (_searchQuery.isNotEmpty) {
         currentDisplayedQuestions = _allExamQuestions.where((question) {
           final query = _searchQuery.toLowerCase();
           return question.questionText.toLowerCase().contains(query) ||
-                 (question.questionNumber?.toString().contains(query) ?? false);
+              (question.questionNumber?.toString().contains(query) ?? false);
         }).toList();
       }
 
-      _questions = currentDisplayedQuestions; // This is the list for "All Questions" tab, filtered by search
-      _questionsForReview = _questions.where((q) => q.isMarkedForReview).toList(); // This is the list for "To Review" tab, filtered by search AND review status
+      _questions =
+          currentDisplayedQuestions; // This is the list for "All Questions" tab, filtered by search
+      _questionsForReview = _questions
+          .where((q) => q.isMarkedForReview)
+          .toList(); // This is the list for "To Review" tab, filtered by search AND review status
     });
   }
 
   Future<void> _toggleReviewStatus(Question question) async {
-    await _databaseHelper.updateQuestionReviewStatus(question.id!, !question.isMarkedForReview);
+    await _databaseHelper.updateQuestionReviewStatus(
+      question.id!,
+      !question.isMarkedForReview,
+    );
     _loadQuestions(); // Reload to reflect the change
   }
 
@@ -95,14 +112,20 @@ class _ExamHomeScreenState extends State<ExamHomeScreen> with SingleTickerProvid
                 decoration: InputDecoration(
                   hintText: 'Search questions...',
                   border: InputBorder.none,
-                  hintStyle: TextStyle(color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7)),
+                  hintStyle: TextStyle(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onPrimary.withOpacity(0.7),
+                  ),
                 ),
                 style: const TextStyle(color: Colors.black, fontSize: 18.0),
               )
             : Text(widget.exam.title),
         actions: [
           IconButton(
-            icon: _isSearching ? const Icon(Icons.close) : const Icon(Icons.search),
+            icon: _isSearching
+                ? const Icon(Icons.close)
+                : const Icon(Icons.search),
             onPressed: _toggleSearch,
           ),
         ],
@@ -117,8 +140,20 @@ class _ExamHomeScreenState extends State<ExamHomeScreen> with SingleTickerProvid
       body: TabBarView(
         controller: _tabController,
         children: [
-          QuestionListView(key: const ValueKey('all_questions_list'), questions: _questions, onToggleReview: _toggleReviewStatus, allQuestions: _allExamQuestions, questionsToPage: _allExamQuestions),
-          QuestionListView(key: const ValueKey('to_review_list'), questions: _questionsForReview, onToggleReview: _toggleReviewStatus, allQuestions: _allExamQuestions, questionsToPage: _allReviewQuestions),
+          QuestionListView(
+            key: const ValueKey('all_questions_list'),
+            questions: _questions,
+            onToggleReview: _toggleReviewStatus,
+            allQuestions: _allExamQuestions,
+            questionsToPage: _allExamQuestions,
+          ),
+          QuestionListView(
+            key: const ValueKey('to_review_list'),
+            questions: _questionsForReview,
+            onToggleReview: _toggleReviewStatus,
+            allQuestions: _allExamQuestions,
+            questionsToPage: _allReviewQuestions,
+          ),
         ],
       ),
     );
